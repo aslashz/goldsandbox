@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="annualLeaveProcess" name="Annual Leave Process" isExecutable="true">
+    <startEvent id="startApplyLeave" name="Start Apply Leave">
+      <extensionElements>
+        <activiti:formProperty id="user.name" name="User Name" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="user.msg" name="User Message" type="string" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="hrdApproval" name="HRD Approval">
+      <extensionElements>
+        <activiti:formProperty id="acceptLeaveHRD" name="Accept Leave HRD" type="enum" required="true">
+          <activiti:value id="true" name="Accept"></activiti:value>
+          <activiti:value id="false" name="Reject"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startApplyLeave" targetRef="hrdApproval"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="hrdApproval" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="rejectLeaveHRD">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptLeaveHRD == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="acceptLeaveHRD">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptLeaveHRD == true}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="rejectLeaveHRD" name="Reject Leave" activiti:expression="#{notificationService.rejectLeaveHRD(execution)}"></serviceTask>
+    <serviceTask id="acceptLeaveHRD" name="Accept Leave" activiti:expression="#{notificationService.acceptLeaveHRD(execution)}"></serviceTask>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_annualLeaveProcess">
+    <bpmndi:BPMNPlane bpmnElement="annualLeaveProcess" id="BPMNPlane_annualLeaveProcess">
+      <bpmndi:BPMNShape bpmnElement="startApplyLeave" id="BPMNShape_startApplyLeave">
+        <omgdc:Bounds height="35.0" width="35.0" x="40.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="hrdApproval" id="BPMNShape_hrdApproval">
+        <omgdc:Bounds height="55.0" width="105.0" x="120.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="270.0" y="168.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectLeaveHRD" id="BPMNShape_rejectLeaveHRD">
+        <omgdc:Bounds height="55.0" width="105.0" x="238.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="acceptLeaveHRD" id="BPMNShape_acceptLeaveHRD">
+        <omgdc:Bounds height="55.0" width="105.0" x="238.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="75.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="225.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="188.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="290.0" y="208.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="290.0" y="168.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

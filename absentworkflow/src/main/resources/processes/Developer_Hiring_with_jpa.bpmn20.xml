@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://activiti.com/modeler" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef" modeler:version="1.0en" modeler:exportDateTime="20150216104339475" modeler:modelId="933057" modeler:modelVersion="3" modeler:modelLastUpdated="1424083415708">
+  <signal id="cancelApplication" name="cancelApplication"></signal>
+  <process id="hireProcessWithJpa" name="Developer Hiring" isExecutable="true">
+    <userTask id="sid-42BAE58A-8FFB-4B02-AAED-E0D8EA5A7E39" name="Telephone interview" activiti:candidateGroups="dev-managers">
+      <documentation>Conduct a telephone interview with ${applicant.name}. Phone number = ${applicant.phoneNumber}</documentation>
+      <extensionElements>
+        <activiti:formProperty id="telephoneInterviewOutcome" name="Telephone Interview Outcome" type="enum" required="true">
+          <activiti:value id="true" name="Accept"></activiti:value>
+          <activiti:value id="false" name="Reject"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="sid-47ECD3C6-CA48-40D8-B478-6C26A122FA28"></exclusiveGateway>
+    <sequenceFlow id="sid-B468226B-DB2E-421E-B04B-5FF1622F3E78" sourceRef="sid-42BAE58A-8FFB-4B02-AAED-E0D8EA5A7E39" targetRef="sid-47ECD3C6-CA48-40D8-B478-6C26A122FA28"></sequenceFlow>
+    <endEvent id="sid-A4859521-98BA-44EA-A9B1-55445823CE0D"></endEvent>
+    <sequenceFlow id="sid-D536B119-9F6C-45B6-B1B6-8142AE70208A" sourceRef="sid-59C993BD-38A0-4DC3-97BC-F58FD94E38A9" targetRef="sid-A4859521-98BA-44EA-A9B1-55445823CE0D"></sequenceFlow>
+    <serviceTask id="sid-59C993BD-38A0-4DC3-97BC-F58FD94E38A9" name="Send rejection email" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${applicant.email}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Your application has been rejected]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="html">
+          <activiti:expression><![CDATA[Dear ${applicant.name},
+
+We're sorry to inform you that your recent application has been rejected. We have stored your information in our data systems and will contact you if in the future a potential matching application is posted on our website.
+
+Regards,
+My Corp]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="sid-9DFC483F-2C57-4378-AE25-30460BD3838F" name="Store resume" activiti:expression="${resumeService.storeResume()}"></serviceTask>
+    <sequenceFlow id="sid-366D79F8-23D7-4E3F-8F0F-3C29545C81FB" sourceRef="sid-9DFC483F-2C57-4378-AE25-30460BD3838F" targetRef="sid-42BAE58A-8FFB-4B02-AAED-E0D8EA5A7E39"></sequenceFlow>
+    <startEvent id="sid-E0DD2D8E-0672-4BE0-97A4-933DD8771EFF">
+      <extensionElements>
+        <activiti:formProperty id="applicant.name" name="Applicant Name" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="applicant.email" name="Applicant Email" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="applicant.phone" name="Applicant Phone" type="string" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="sid-D4DD49AB-01E3-4A84-9B46-7CE0C414D71D" sourceRef="sid-E0DD2D8E-0672-4BE0-97A4-933DD8771EFF" targetRef="sid-9DFC483F-2C57-4378-AE25-30460BD3838F"></sequenceFlow>
+    <sequenceFlow id="sid-F967A26E-3C8E-45AD-B791-C473491DA988" sourceRef="sid-47ECD3C6-CA48-40D8-B478-6C26A122FA28" targetRef="sid-59C993BD-38A0-4DC3-97BC-F58FD94E38A9">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${telephoneInterviewOutcome == false}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="sid-3D63E564-D35A-42E3-A81E-6D7DF325D118"></exclusiveGateway>
+    <endEvent id="sid-76F28F61-0B2A-41BA-8A71-5E4C9C7828E4" name="accepted"></endEvent>
+    <userTask id="usertask1" name="Technical Interview">
+      <extensionElements>
+        <activiti:formProperty id="techOk" name="Tech Result" type="enum" required="true">
+          <activiti:value id="true" name="Accept"></activiti:value>
+          <activiti:value id="false" name="Reject"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="sid-47ECD3C6-CA48-40D8-B478-6C26A122FA28" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${telephoneInterviewOutcome == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="sid-3D63E564-D35A-42E3-A81E-6D7DF325D118"></sequenceFlow>
+    <serviceTask id="sid-9DFC483F-2C57-4378-AE25-30460BD3838Z" name="Send Welcome Email" activiti:expression="${welcomeService.sendEmail(applicant.email, applicant.name)}"></serviceTask>
+    <sequenceFlow id="flow3" sourceRef="sid-3D63E564-D35A-42E3-A81E-6D7DF325D118" targetRef="sid-9DFC483F-2C57-4378-AE25-30460BD3838Z">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${techOk == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="sid-9DFC483F-2C57-4378-AE25-30460BD3838Z" targetRef="sid-76F28F61-0B2A-41BA-8A71-5E4C9C7828E4"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="sid-3D63E564-D35A-42E3-A81E-6D7DF325D118" targetRef="sid-59C993BD-38A0-4DC3-97BC-F58FD94E38A9">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${techOk == false}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_hireProcessWithJpa">
+    <bpmndi:BPMNPlane bpmnElement="hireProcessWithJpa" id="BPMNPlane_hireProcessWithJpa">
+      <bpmndi:BPMNShape bpmnElement="sid-42BAE58A-8FFB-4B02-AAED-E0D8EA5A7E39" id="BPMNShape_sid-42BAE58A-8FFB-4B02-AAED-E0D8EA5A7E39">
+        <omgdc:Bounds height="80.0" width="100.0" x="320.0" y="185.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-47ECD3C6-CA48-40D8-B478-6C26A122FA28" id="BPMNShape_sid-47ECD3C6-CA48-40D8-B478-6C26A122FA28">
+        <omgdc:Bounds height="40.0" width="40.0" x="465.0" y="205.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-A4859521-98BA-44EA-A9B1-55445823CE0D" id="BPMNShape_sid-A4859521-98BA-44EA-A9B1-55445823CE0D">
+        <omgdc:Bounds height="35.0" width="35.0" x="660.0" y="52.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-59C993BD-38A0-4DC3-97BC-F58FD94E38A9" id="BPMNShape_sid-59C993BD-38A0-4DC3-97BC-F58FD94E38A9">
+        <omgdc:Bounds height="80.0" width="100.0" x="525.0" y="30.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-9DFC483F-2C57-4378-AE25-30460BD3838F" id="BPMNShape_sid-9DFC483F-2C57-4378-AE25-30460BD3838F">
+        <omgdc:Bounds height="80.0" width="100.0" x="175.0" y="185.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-E0DD2D8E-0672-4BE0-97A4-933DD8771EFF" id="BPMNShape_sid-E0DD2D8E-0672-4BE0-97A4-933DD8771EFF">
+        <omgdc:Bounds height="35.0" width="35.0" x="105.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-3D63E564-D35A-42E3-A81E-6D7DF325D118" id="BPMNShape_sid-3D63E564-D35A-42E3-A81E-6D7DF325D118">
+        <omgdc:Bounds height="40.0" width="40.0" x="750.0" y="204.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-76F28F61-0B2A-41BA-8A71-5E4C9C7828E4" id="BPMNShape_sid-76F28F61-0B2A-41BA-8A71-5E4C9C7828E4">
+        <omgdc:Bounds height="35.0" width="35.0" x="980.0" y="208.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="590.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-9DFC483F-2C57-4378-AE25-30460BD3838Z" id="BPMNShape_sid-9DFC483F-2C57-4378-AE25-30460BD3838Z">
+        <omgdc:Bounds height="55.0" width="105.0" x="841.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-B468226B-DB2E-421E-B04B-5FF1622F3E78" id="BPMNEdge_sid-B468226B-DB2E-421E-B04B-5FF1622F3E78">
+        <omgdi:waypoint x="420.0" y="225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="465.0" y="225.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-D536B119-9F6C-45B6-B1B6-8142AE70208A" id="BPMNEdge_sid-D536B119-9F6C-45B6-B1B6-8142AE70208A">
+        <omgdi:waypoint x="625.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="69.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-366D79F8-23D7-4E3F-8F0F-3C29545C81FB" id="BPMNEdge_sid-366D79F8-23D7-4E3F-8F0F-3C29545C81FB">
+        <omgdi:waypoint x="275.0" y="225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="225.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-D4DD49AB-01E3-4A84-9B46-7CE0C414D71D" id="BPMNEdge_sid-D4DD49AB-01E3-4A84-9B46-7CE0C414D71D">
+        <omgdi:waypoint x="140.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="175.0" y="225.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-F967A26E-3C8E-45AD-B791-C473491DA988" id="BPMNEdge_sid-F967A26E-3C8E-45AD-B791-C473491DA988">
+        <omgdi:waypoint x="485.0" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="485.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="525.0" y="70.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="505.0" y="225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="224.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="695.0" y="224.0"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="224.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="790.0" y="224.0"></omgdi:waypoint>
+        <omgdi:waypoint x="841.0" y="224.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="946.0" y="224.0"></omgdi:waypoint>
+        <omgdi:waypoint x="980.0" y="225.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="770.0" y="204.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
