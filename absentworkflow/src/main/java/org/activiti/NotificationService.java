@@ -12,11 +12,18 @@ public class NotificationService {
     private RuntimeService runtimeService;
     
     public void rejectLeaveHRD(DelegateExecution execution) {
-        System.out.println("Rejected by HRD\nEmp:"+execution.getVariable("employee"));
+        System.out.println("Rejected by HRD\n    [+] Emp:"+execution.getVariable("employee"));
     }
     
     public void acceptLeaveHRD(DelegateExecution execution) {
-        System.out.println("Accepted by HRD\nEmp:"+execution.getVariable("employee"));
+        System.out.println("Accepted by HRD\n    [+] Emp:"+execution.getVariable("employee"));
     }
-
+    
+    public void rejectLeaveSUP(DelegateExecution execution) {
+        System.out.println("Rejected by supervisor\n    [+] Emp:"+execution.getVariable("employee"));
+    }
+    
+    public void acceptLeaveSUP(DelegateExecution execution) {
+        System.out.println("Accepted by supervisor\n    [+] Emp:"+execution.getVariable("employee"));
+    }
 }

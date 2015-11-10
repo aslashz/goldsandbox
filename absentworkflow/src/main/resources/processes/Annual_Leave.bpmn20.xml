@@ -24,8 +24,32 @@
     <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="acceptLeaveHRD">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptLeaveHRD == true}]]></conditionExpression>
     </sequenceFlow>
-    <serviceTask id="rejectLeaveHRD" name="Reject Leave" activiti:expression="#{notificationService.rejectLeaveHRD(execution)}"></serviceTask>
-    <serviceTask id="acceptLeaveHRD" name="Accept Leave" activiti:expression="#{notificationService.acceptLeaveHRD(execution)}"></serviceTask>
+    <serviceTask id="rejectLeaveHRD" name="Reject Leave HRD" activiti:expression="#{notificationService.rejectLeaveHRD(execution)}"></serviceTask>
+    <serviceTask id="acceptLeaveHRD" name="Accept Leave HRD" activiti:expression="#{notificationService.acceptLeaveHRD(execution)}"></serviceTask>
+    <serviceTask id="acceptLeaveSUP" name="Accept Leave SUP" activiti:expression="#{notificationService.acceptLeaveSUP(execution)}"></serviceTask>
+    <serviceTask id="rejectLeaveSUP" name="Reject Leave SUP" activiti:expression="#{notificationService.rejectLeaveSUP(execution)}"></serviceTask>
+    <boundaryEvent id="escalationTimerHRD" name="Timer" attachedToRef="hrdApproval" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT1M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="supApproval" name="SUP Approval">
+      <extensionElements>
+        <activiti:formProperty id="acceptLeaveSUP" name="Accept Leave SUP" type="enum" required="true">
+          <activiti:value id="true" name="Accept"></activiti:value>
+          <activiti:value id="false" name="Reject"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow6" sourceRef="supApproval" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="exclusivegateway2" targetRef="acceptLeaveSUP">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptLeaveSUP == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="exclusivegateway2" targetRef="rejectLeaveSUP">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptLeaveSUP == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="escalationTimerHRD" targetRef="supApproval"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_annualLeaveProcess">
     <bpmndi:BPMNPlane bpmnElement="annualLeaveProcess" id="BPMNPlane_annualLeaveProcess">
@@ -35,14 +59,29 @@
       <bpmndi:BPMNShape bpmnElement="hrdApproval" id="BPMNShape_hrdApproval">
         <omgdc:Bounds height="55.0" width="105.0" x="120.0" y="160.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="escalationTimerHRD" id="BPMNShape_escalationTimerHRD">
+        <omgdc:Bounds height="30.0" width="30.0" x="150.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
         <omgdc:Bounds height="40.0" width="40.0" x="270.0" y="168.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="rejectLeaveHRD" id="BPMNShape_rejectLeaveHRD">
-        <omgdc:Bounds height="55.0" width="105.0" x="238.0" y="260.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="238.0" y="240.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="acceptLeaveHRD" id="BPMNShape_acceptLeaveHRD">
-        <omgdc:Bounds height="55.0" width="105.0" x="238.0" y="50.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="238.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="acceptLeaveSUP" id="BPMNShape_acceptLeaveSUP">
+        <omgdc:Bounds height="55.0" width="105.0" x="518.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectLeaveSUP" id="BPMNShape_rejectLeaveSUP">
+        <omgdc:Bounds height="55.0" width="105.0" x="518.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="supApproval" id="BPMNShape_supApproval">
+        <omgdc:Bounds height="55.0" width="105.0" x="400.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="550.0" y="167.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="75.0" y="187.0"></omgdi:waypoint>
@@ -54,11 +93,28 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
         <omgdi:waypoint x="290.0" y="208.0"></omgdi:waypoint>
-        <omgdi:waypoint x="290.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="240.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
         <omgdi:waypoint x="290.0" y="168.0"></omgdi:waypoint>
-        <omgdi:waypoint x="290.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="135.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="505.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="570.0" y="167.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="570.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="165.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="289.0" y="383.0"></omgdi:waypoint>
+        <omgdi:waypoint x="452.0" y="215.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
