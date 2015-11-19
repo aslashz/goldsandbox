@@ -26,4 +26,20 @@ public class NotificationService {
     public void acceptLeaveSUP(DelegateExecution execution) {
         System.out.println("Accepted by supervisor\n    [+] Emp:"+execution.getVariable("employee"));
     }
+    
+    public void acceptSelectionStage(DelegateExecution execution) {
+        CandidateEmployee candEmployee = (CandidateEmployee) execution.getVariable("candEmployee");
+        candEmployee.setStatus(CandidateEmployeeRepository.STATUS_ACC);
+        System.out.println("Candidate employee "+execution.getVariable("candEmployee") + " inserted into database");
+    }
+    public void acceptQualificationStage(DelegateExecution execution) {
+        CandidateEmployee candEmployee = (CandidateEmployee) execution.getVariable("candEmployee");
+        candEmployee.setStatus(CandidateEmployeeRepository.STATUS_PEN);
+        System.out.println("Candidate employee "+execution.getVariable("candEmployee") + " saved for reference");
+    }
+    public void rejectQualificationStage(DelegateExecution execution) {
+        CandidateEmployee candEmployee = (CandidateEmployee) execution.getVariable("candEmployee");
+        candEmployee.setStatus(CandidateEmployeeRepository.STATUS_REJ);
+        System.out.println("Candidate employee "+execution.getVariable("candEmployee") + " has been rejected");
+    }
 }

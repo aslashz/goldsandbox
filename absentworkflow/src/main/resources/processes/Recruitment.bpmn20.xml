@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="recruitmentProcess" name="Recruitment Process" isExecutable="true">
+    <startEvent id="startRecruitment" name="Start Recruitment">
+      <extensionElements>
+        <activiti:formProperty id="user.name" name="User Name" type="string" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="selectionStage" name="Selection Stage">
+      <extensionElements>
+        <activiti:formProperty id="acceptSelection" name="Accept Selection" type="enum">
+          <activiti:value id="true" name="Accept"></activiti:value>
+          <activiti:value id="false" name="Reject"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startRecruitment" targetRef="selectionStage"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="selectionStage" targetRef="exclusivegateway1"></sequenceFlow>
+    <serviceTask id="addEmployee" name="Add to Employee Database" activiti:expression="#{notificationService.acceptSelectionStage(execution)}"></serviceTask>
+    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="addEmployee">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptSelection == true}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="qualificationStage" name="Qualification Stage">
+      <extensionElements>
+        <activiti:formProperty id="acceptQualification" name="Accept Qualification" type="enum" required="true">
+          <activiti:value id="true" name="Accept"></activiti:value>
+          <activiti:value id="false" name="Reject"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="qualificationStage">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptSelection == false}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow5" sourceRef="qualificationStage" targetRef="exclusivegateway2"></sequenceFlow>
+    <serviceTask id="KeepRefThx" name="Keep for Ref and Thank you" activiti:expression="#{notificationService.acceptQualificationStage(execution)}"></serviceTask>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway2" targetRef="KeepRefThx">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acceptQualification == true}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="rejectionStage" name="Rejection Stage" activiti:expression="#{notificationService.rejectQualificationStage(execution)}"></serviceTask>
+    <sequenceFlow id="flow7" sourceRef="exclusivegateway2" targetRef="rejectionStage"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_recruitmentProcess">
+    <bpmndi:BPMNPlane bpmnElement="recruitmentProcess" id="BPMNPlane_recruitmentProcess">
+      <bpmndi:BPMNShape bpmnElement="startRecruitment" id="BPMNShape_startRecruitment">
+        <omgdc:Bounds height="35.0" width="35.0" x="70.0" y="130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="selectionStage" id="BPMNShape_selectionStage">
+        <omgdc:Bounds height="55.0" width="105.0" x="180.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="350.0" y="127.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="addEmployee" id="BPMNShape_addEmployee">
+        <omgdc:Bounds height="55.0" width="105.0" x="480.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="qualificationStage" id="BPMNShape_qualificationStage">
+        <omgdc:Bounds height="55.0" width="105.0" x="318.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="350.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="KeepRefThx" id="BPMNShape_KeepRefThx">
+        <omgdc:Bounds height="55.0" width="105.0" x="480.0" y="293.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectionStage" id="BPMNShape_rejectionStage">
+        <omgdc:Bounds height="55.0" width="105.0" x="318.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="105.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="147.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="285.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="147.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="390.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="147.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="370.0" y="167.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="210.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="370.0" y="265.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="300.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="390.0" y="320.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="320.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="370.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="370.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
