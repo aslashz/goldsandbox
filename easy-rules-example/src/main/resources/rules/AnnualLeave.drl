@@ -1,0 +1,35 @@
+//created on: Dec 1, 2015
+package org.easyrulestest
+ 
+import org.easyrulestest.Employee
+import org.easyrulestest.Date
+
+
+rule "AcceptLeave"
+    when
+        $leaveStatus : LeaveStatus( $employee : employee, $leaveDate : leaveDate, $leaveDuration : leaveDuration)
+        eval(countLeaveAvailable($leaveStatus.getLeaveDate(), $leaveStatus.getEmployee().getStartContract()) - $leaveStatus.getLeaveDuration() >= 0)
+        
+    then
+        $leaveStatus.setStatus(LeaveStatus.ACCEPTED);
+        System.out.println($leaveStatus.getEmployee()+" ACCEPTED");
+end
+
+rule "RejectLeave"
+    when
+        $leaveStatus : LeaveStatus( $employee : employee, $leaveDate : leaveDate, $leaveDuration : leaveDuration)
+        eval(countLeaveAvailable($leaveStatus.getLeaveDate(), $leaveStatus.getEmployee().getStartContract()) - $leaveStatus.getLeaveDuration() < 0)
+    then
+        $leaveStatus.setStatus(LeaveStatus.REJECTED);
+        System.out.println($leaveStatus.getEmployee()+" REJECTED");
+end
+
+function int countLeaveAvailable(Date leaveDate, Date startContract) {
+    int counter = 0;
+    if (startContract.getDay() <= 15) {
+        counter = 1;
+    }
+    // assume same year //
+    counter += (leaveDate.getMonth() - startContract.getMonth());
+    return counter;
+}
