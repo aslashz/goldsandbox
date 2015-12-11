@@ -1,0 +1,36 @@
+//created on: Dec 11, 2015
+package org.easyrulestest
+
+//list any import classes here.
+
+import java.util.List;
+
+//declare any global variables here
+
+
+
+
+rule "Mul"
+    agenda-group "Math"
+    when
+        $arr : List() from collect(Integer())
+    then
+        int tmp = 1;
+        for (Object ob : $arr) {
+            Integer ii = (Integer) ob;
+            tmp *= ii;
+        }
+        System.out.println(tmp);
+end
+rule "Concat"
+    agenda-group "String"
+    when
+        $arr : List() from collect(Integer())
+    then
+        String ss = "";
+        for (Object ob : $arr) {
+            Integer ii = (Integer) ob;
+            ss += ii + " ";
+        }
+        System.out.println(ss);
+end
