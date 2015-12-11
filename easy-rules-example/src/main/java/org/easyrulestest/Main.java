@@ -55,12 +55,15 @@ public class Main {
         kSession.insert(new Integer(3));
         kSession.getAgenda().getAgendaGroup("String").setFocus();
         kSession.fireAllRules();
+        kSession.dispose();
+        kSession = kContainer.newKieSession("ksession-rules");
         System.out.println("Run group math");
         kSession.insert(new Integer(1));
         kSession.insert(new Integer(2));
         kSession.insert(new Integer(3));
         kSession.getAgenda().getAgendaGroup("Math").setFocus();
         kSession.fireAllRules();
+        kSession.dispose();
     }
     public static void main(String[] args) {
         //testLeaveEmployee();
